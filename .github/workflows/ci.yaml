@@ -1,0 +1,86 @@
+name: CI Model
+
+env:
+  MODEL-NAME: yolov5-nodeflux
+  REPO-MODEL-PATH: model # default = model
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Download Assets
+        uses: robinraju/release-downloader@v1.3
+        with:
+          repository: ${{ github.repository }}
+          tag: ${{ github.ref_name }}
+          fileName: '*'
+          tarBall: false
+          zipBall: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ github.repository }}:${{ github.ref_name }}
+
+  nuclio-debug:
+    needs: [ build-docker ]
+    name: Debug Model with Nuclio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Nuclio Debug Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'ruhyadi/nuclio-debug'
+          ref: v1.0
+
+      - name: Checkout Model Repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          path: ${{ env.REPO-MODEL-PATH }}
+
+      - name: Deploy Model
+        id: deploy-model
+        uses: ruhyadi/nuclio-debug@v1.0
+        with:
+          model-path: ./${{ env.REPO-MODEL-PATH }}
+          model-name: ${{ env.MODEL-NAME }}
+
+  delete-release:
+    needs: [ nuclio-debug, build-docker ]
+    name: Delete Release
+    runs-on: ubuntu-latest
+    if: always() && (needs.nuclio-debug.result=='failure' || needs.build-docker.result=='failure')
+    steps:
+      - name: Delete Tag and Release 
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: ${{ github.ref_name }}
+          repo: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
