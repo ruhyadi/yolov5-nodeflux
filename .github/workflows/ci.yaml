@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'ruhyadi/nuclio-debug'
-          ref: v1.0
+          ref: v1.1
 
       - name: Checkout Model Repo
         uses: actions/checkout@v3
@@ -71,7 +71,7 @@ jobs:
 
       - name: Deploy Model
         id: deploy-model
-        uses: ruhyadi/nuclio-debug@v1.0
+        uses: ruhyadi/nuclio-debug@v1.1
         with:
           model-path: ./${{ env.REPO-MODEL-PATH }}
 
