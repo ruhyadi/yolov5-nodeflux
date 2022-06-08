@@ -2,4 +2,6 @@
 
 FROM ultralytics/yolov5:latest-cpu
 
-ENTRYPOINT [ "bash" ]
+RUN mkdir /opt/nuclio
+
+COPY ./weights /opt/nuclio/weights

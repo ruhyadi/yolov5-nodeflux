@@ -1,8 +1,8 @@
 metadata:
-  name: yolov5-nodeflux
+  name: yolov5-demo
   namespace: cvat
   annotations:
-    name: YOLO v5
+    name: YOLOv5 Demo
     type: detector
     framework: pytorch
     spec: |
@@ -90,13 +90,13 @@ metadata:
       ]
 
 spec:
-  description: YOLO v5 via pytorch hub
+  description: Demo YOLOv5
   runtime: 'python:3.6'
   handler: main:handler
   eventTimeout: 30s
   build:
-    image: cvat/yolov5-nodeflux
-    baseImage: ultralytics/yolov5:latest-cpu
+    image: cvat/yolov5-demo
+    baseImage: ruhyadi/yolov5:v1.0
 
     directives:
       preCopy:
