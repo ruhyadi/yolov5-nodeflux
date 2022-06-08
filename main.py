@@ -4,11 +4,13 @@ from PIL import Image
 import io
 import torch
 
+from model_handler import load_model
+
 def init_context(context):
     context.logger.info("Init context...  0%")
 
     # Read the DL model
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')  # or yolov5m, yolov5l, yolov5x, custom
+    model = load_model(model_path='weights/yolov5s.pt')
     context.user_data.model = model
 
     context.logger.info("Init context...100%")
