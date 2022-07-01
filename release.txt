@@ -1,1 +1,1 @@
-Release v7.0.3 of yolov5 model
+Release v7.0.3 of yolov5s model
