@@ -1,1 +1,1 @@
-Release v1.0 of xxx model
+Release v20.0 of yolov5s model
