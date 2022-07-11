@@ -1,1 +1,1 @@
-Release v11.0 of xxx model
+Release v1.0 of xxx model
